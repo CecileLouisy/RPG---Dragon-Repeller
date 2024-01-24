@@ -35,7 +35,7 @@ const locations=[
         name: "town square",
         "button text": ["Go to store","Go to cave","Fight dragon"],
         "button functions": [goStore,goCave,fightDragon],
-        text: "You are in the town square. You see a sign that says \"Store\"."
+        text: "You are in the town square. You see a sign that says \"Store\"."//use / or '
     },
     {
         name: "store",
@@ -82,11 +82,11 @@ const locations=[
 ];
 
 //initialize buttons
-button1.onclick=goStore()
-button2.onclick=goCave()
-button3.onclick=fightDragon()
+button1.onclick=goStore;
+button2.onclick=goCave;
+button3.onclick=fightDragon;
 
-function update(location) {
+function update(location){
     monsterStats.style.display="none";//After a monster is defeated, the monster's stat box should no longer display
     text.innerText=location.text;
     button1.innerText=location["button text"][0];
@@ -96,40 +96,40 @@ function update(location) {
     button2.onclick=location["button functions"][1];
     button3.onclick=location["button functions"][2];
 }
-function goTown() {
+function goTown(){
     update(locations[0]);
 }
 
-function goStore() {
+function goStore(){
     update(locations[1]);
 }
 
-function goCave() {
+function goCave(){
     update(locations[2]);
 }
 
-function goFight() {
+function goFight(){
     update(locations[3]);
     monsterHealth=monsters[fighting].health;
     monsterStats.style.display="block";
     monsterName.innerText=monsters[fighting].name;
-    monsterHealthText.innerText=monsters[fighting].health;
+    monsterHealthText.innerText=monsterHealth;
 }
 
-function buyHealth() {
-    if (gold>=10) {
+function buyHealth(){
+    if(gold>=10){
         gold-=10;
         health+=10;
         goldText.innerText=gold;
         healthText.innerText=health;
-    } else {
+    }else{
         text.innerText="You do not have enough gold to buy health.";
     }
 }
 
-function buyWeapon() {
-    if (currentWeapon<weapons.length-1) { //because array index starts at 0
-        if (gold>=30) {
+function buyWeapon(){
+    if(currentWeapon<weapons.length-1){ //because array index starts at 0
+        if(gold>=30){
             gold-=30;
             currentWeapon++;
             goldText.innerText=gold;
@@ -137,84 +137,83 @@ function buyWeapon() {
             text.innerText="You now have a " +newWeapon+".";
             inventory.push(newWeapon);//add the new weapon to inventory
             text.innerText+=" In your inventory you have: "+inventory;
-        } else {
+        }else{
             text.innerText="You do not have enough gold to buy a weapon.";
         }
-
-    } else {
+    }else{
         text.innerText="You already have the most powerful weapon!";
         button2.innerText="Sell weapon for 15 gold";
         button2.onclick=sellWeapon;
     }
 }
 
-function sellWeapon() {
-    if (inventory.length>1) { //players can't sell their only weapon
+function sellWeapon(){
+    if(inventory.length>1){ //players can't sell their only weapon
         gold+=15;
         goldText.innerText=gold;
-        let currentWeapon=inventory.shift()
+        let currentWeapon=inventory.shift();
         text.innerText="You sold a "+currentWeapon+".";
         text.innerText+=" In your inventory you have: "+inventory;
-    } else {
+    }else{
         text.innerText="Don't sell your only weapon!";
     }
 }
 
-function fightSlime() {
+function fightSlime(){
     fighting=0;
     goFight();
 }
 
-function fightBeast() {
+function fightBeast(){
     fighting=1;
     goFight();
 }
 
-function fightDragon() {
+function fightDragon(){
     fighting=2;
     goFight();
 }
 
-function attack() {
+function attack(){
     text.innerText="The "+monsters[fighting].name+" attacks.";
     text.innerText+=" You attack it with your "+weapons[currentWeapon].name+".";
     health-=getMonsterAttackValue(monsters[fighting].level);//Health=Health minus the return value of the getMonsterAttackValue function, with the level of the monster as an argument.
     //Monster Health minus the power of the current weapon, minus random range between 1 and the value of xp.
-    if (isMonsterHit()) {
+    if(isMonsterHit()){
         monsterHealth-=weapons[currentWeapon].power+Math.floor(Math.random()*xp)+1;
-    } else {
+    }else{
         text.innerText+=" You miss.";
     }
     healthText.innerText=health;
     monsterHealthText.innerText=monsterHealth;
-    if (health<=0) {
+    if(health<=0){
         lose();
-    } else if (monsterHealth<=0) {
-        fighting===2?winGame():defeatMonster();
+    }else if(monsterHealth<=0){
+        fighting===2?winGame():defeatMonster();//if the player is fighting the dragon->win, else defeat monster
     }
     //Chance of breaking the weapon on every attack=0.1 & we don't want a player's only weapon to break
-    if (Math.random()<=.1&&inventory.length!==1){
+    if(Math.random()<=.1 && inventory.length!==1){
         text.innerText+=" Your "+inventory.pop()+" breaks." //remove (and return in the text) the last item in the inventory
-        currentWeapon--
+        currentWeapon--;
     }
 }
 
-function getMonsterAttackValue(level) {
+function getMonsterAttackValue(level){
     const hit=(level*5)-(Math.floor(Math.random()*xp));//The attack of the monster is based on the monster's level and the player's xp : this set the monster's attack to 5 time their level minus a random number between 0 and the player's xp.
     console.log(hit);
     return hit>0?hit:0;//ternary operator returns hit if hit is greater than 0, or returns 0 if it is not.
 }
 
-function isMonsterHit() {
-    return Math.random()>.2||health<20;//The player hit if random 0-1>0.2 or health<20
+function isMonsterHit(){
+    return Math.random()>.2 || health<20;//The player hit if random 0-1>0.2 or health<20
 
 }
 
-function dodge() {
+function dodge(){
     text.innerText="You dodge the attack from the "+monsters[fighting].name+"."
 }
 
-function defeatMonster() {
+function defeatMonster(){
     gold+=Math.floor(monsters[fighting].level*6.7);//13 good luck?
     xp+=monsters[fighting].level;
     goldText.innerText=gold;//Updating values
@@ -222,15 +221,15 @@ function defeatMonster() {
     update(locations[4]);
 }
 
-function lose() {
+function lose(){
     update(locations[5]);
 }
 
-function winGame() {
+function winGame(){
     update(locations[6]);
 }
 
-function restart() {
+function restart(){
     xp=0;
     health=100;
     gold=50;
@@ -242,25 +241,24 @@ function restart() {
     goTown();
 }
 
-function easterEgg() {
-    update(locations[7]);
+function easterEgg(){
+    update(locations[7]);//lucky you are
 }
 
-function pick(guess) {
+function pick(guess){
     const numbers=[];
-    while(numbers.length<10) {
+    while(numbers.length<10){
     numbers.push(Math.floor(Math.random()*11));//push a random number between 0 and 10 in the end of the numbers array.    
     }
     text.innerText="You picked "+guess+". Here are the random numbers:\n";//\n new line for the next text.innerText
-    for(let i=0;i<10;i++) {
+    for(let i=0;i<10;i++){
         text.innerText+=numbers[i]+"\n";//
     }
-    if(numbers.includes(guess)) {
-        console.log("The number is in the array.");
+    if(numbers.includes(guess)){//the number is in the array
         text.innerText+="Right! You win 20 gold!";
         gold+=20;
         goldText.innerText=gold;
-    } else {
+    }else{
         text.innerText+="Wrong! You lose 10 health!";
         health-=10;
         healthText.innerText=health;
@@ -270,10 +268,10 @@ function pick(guess) {
     }
 }
 
-function pickTwo() {
+function pickTwo(){
     pick(2);
 }
 
-function pickEight() {
+function pickEight(){
     pick(8);
 }
